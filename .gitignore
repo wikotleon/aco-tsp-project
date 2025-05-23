@@ -1,0 +1,17 @@
+#Ignoruj foldery techniczne Pythona
+__pycache__/
+*.pyc
+
+#Ignoruj wyniki działania
+*.png
+*.csv
+*.txt
+*.tsp
+*.opt.tour
+
+#Ignoruj środowisko wirtualne
+venv/
+
+#Pliki systemowe
+.DS_Store
+Thumbs.db
