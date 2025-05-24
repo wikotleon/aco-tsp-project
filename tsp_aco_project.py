@@ -1,10 +1,7 @@
 
 import numpy as np
-import matplotlib.pyplot as plt
 import random
 from typing import List
-import os
-from instance_loader import load_instance
 
 # generator TSP
 def generate_cities(n: int, seed: int = 42):
@@ -39,7 +36,7 @@ def nearest_neighbour(dist_matrix: np.ndarray):
 def tour_length(tour: List[int], dist_matrix: np.ndarray):
     return sum(dist_matrix[tour[i]][tour[i+1]] for i in range(len(tour)-1))
 
-# ----- Ant Colony Optimization zaczynajaca od pozycji algorytmu zachłannego -----
+# Ant Colony Optimization zaczynajaca od pozycji algorytmu zachłannego
 class AntColonyTSPWithGreedyStart:
     def __init__(self, dist_matrix, greedy_tour, n_ants=10, n_iter=100, alpha=1, beta=5, evaporation=0.5, Q=100):
         self.dist_matrix = dist_matrix
@@ -117,19 +114,6 @@ def two_opt(tour, dist_matrix):
         tour = best
     return best
 
-# wykresy
-def plot_tour(tour, cities, title, filename):
-    x = [cities[i][0] for i in tour]
-    y = [cities[i][1] for i in tour]
-    plt.figure(figsize=(8, 6))
-    plt.plot(x, y, marker='o')
-    plt.title(title)
-    plt.xlabel("X")
-    plt.ylabel("Y")
-    plt.grid(True)
-    plt.savefig(filename)
-    plt.close()
-
 # Obliczanie Dolnej Granicy
 def calculate_lower_bound(dist_matrix):
     n = len(dist_matrix)
@@ -139,56 +123,3 @@ def calculate_lower_bound(dist_matrix):
         bound += sorted_edges[0] + sorted_edges[1]
     return bound / 2
 
-# benchmark
-def run_tests_on_all_instances():
-    for filename in sorted(os.listdir(".")):
-        if filename.endswith(".tsp") or filename.endswith(".txt"):
-            try:
-                cities = load_instance(filename)
-                if len(cities) == 0:
-                    raise ValueError("Plik nie zawiera wspolrzednych.")
-                dist_matrix = create_distance_matrix(cities)
-
-                greedy_tour = nearest_neighbour(dist_matrix)
-                greedy_len = tour_length(greedy_tour, dist_matrix)
-
-                aco = AntColonyTSPWithGreedyStart(dist_matrix, greedy_tour, n_ants=20, n_iter=100)
-                aco_tour, aco_len = aco.run()
-
-                aco_tour_2opt = two_opt(aco_tour, dist_matrix)
-                aco_len_2opt = tour_length(aco_tour_2opt, dist_matrix)
-
-                print(f"--- {filename} ---")
-                print(f"Greedy: {greedy_len:.2f}")
-                print(f"ACO: {aco_len:.2f}")
-                print(f"ACO + 2-opt: {aco_len_2opt:.2f}")
-                print()
-            except Exception as e:
-                print(f"Nie udalo się przetworzyc {filename}: {e}")
-
-# Main
-def main():
-    print("Testowanie losowo wygenerowanej probki...")
-    cities = generate_cities(20)
-    dist_matrix = create_distance_matrix(cities)
-
-    greedy_tour = nearest_neighbour(dist_matrix)
-    greedy_len = tour_length(greedy_tour, dist_matrix)
-
-    aco = AntColonyTSPWithGreedyStart(dist_matrix, greedy_tour, n_ants=20, n_iter=100)
-    aco_tour, aco_len = aco.run()
-
-    aco_tour_2opt = two_opt(aco_tour, dist_matrix)
-    aco_len_2opt = tour_length(aco_tour_2opt, dist_matrix)
-
-    lower_bound = calculate_lower_bound(dist_matrix)
-    print(f"Dolna Granica: {lower_bound:.2f}")
-    print(f"Greedy: {greedy_len:.2f} -> Error: {(greedy_len - lower_bound) / lower_bound * 100:.2f}%")
-    print(f"ACO: {aco_len:.2f} -> Error: {(aco_len - lower_bound) / lower_bound * 100:.2f}%")
-    print(f"ACO + 2-opt: {aco_len_2opt:.2f} -> Error: {(aco_len_2opt - lower_bound) / lower_bound * 100:.2f}%")
-
-    print("\nPrzebieg testow na wszystkich probkach .tsp i .txt  w folderze...")
-    run_tests_on_all_instances()
-
-if __name__ == "__main__":
-    main()
