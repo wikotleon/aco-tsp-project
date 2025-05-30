@@ -8,6 +8,7 @@ Projekt zaliczeniowy z Optymalizacji Kombinatorycznej na Politechnice Poznański
 - `benchmark_runner.py` – testy na benchmarkach TSPLIB + wykresy błędów względnych.
 - `instance_loader.py` – wczytywanie instancji w formacie `.txt` i `.tsp`.
 - `data/` – folder z instancjami TSP (`berlin52.tsp`, `tsp250.txt` itd.).
+- `Sprawozdanie.docx` - sprawozdanie zawierające analize algorytmów (`krótki opis algorytmu`, `wykresy`, `pseudokod`, `tabela instancji rankingowych`).
 
 ## Technologie
 
